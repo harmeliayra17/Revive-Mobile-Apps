@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Steps -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="@font/poppins_bold"
+        android:text="Daily Steps Target"
+        android:textColor="@color/color_primary"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/et_steps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/edittext_background"
+        android:hint="Enter steps target"
+        android:inputType="number"
+        android:padding="16dp"
+        android:textColor="@color/color_primary"
+        android:textColorHint="@color/inactive_grey" />
+
+    <!-- Exercise -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="@font/poppins_bold"
+        android:text="Exercise Duration (minutes)"
+        android:textColor="@color/color_primary"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/et_exercise"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/edittext_background"
+        android:hint="Enter exercise minutes"
+        android:inputType="number"
+        android:padding="16dp"
+        android:textColorHint="@color/inactive_grey" />
+
+    <!-- Water -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="@font/poppins_bold"
+        android:text="Water Intake (ml)"
+        android:textColor="@color/color_primary"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/et_water"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/edittext_background"
+        android:hint="Enter water intake in ml"
+        android:inputType="number"
+        android:padding="16dp"
+        android:textColorHint="@color/inactive_grey" />
+
+    <!-- Sleep -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="@font/poppins_bold"
+        android:text="Sleep Duration (hours)"
+        android:textColor="@color/color_primary"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/et_sleep"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittext_background"
+        android:hint="Enter sleep hours"
+        android:inputType="numberDecimal"
+        android:padding="16dp"
+        android:textColorHint="@color/inactive_grey" />
+
+</LinearLayout>

@@ -1,0 +1,28 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:fontFamily="@font/poppins_medium"
+        android:icon="@drawable/ic_home"
+        android:title="Home" />
+    <item
+        android:id="@+id/nav_exercise"
+        android:fontFamily="@font/poppins_medium"
+        android:icon="@drawable/ic_exercise"
+        android:title="Exercise" />
+    <item
+        android:id="@+id/nav_dummy"
+        android:enabled="true"
+        android:fontFamily="@font/poppins_medium"
+        android:icon="@drawable/ic_transparent"
+        android:title="Add Track" />
+    <item
+        android:id="@+id/nav_progress"
+        android:fontFamily="@font/poppins_medium"
+        android:icon="@drawable/ic_progress"
+        android:title="Progress" />
+    <item
+        android:id="@+id/nav_profile"
+        android:fontFamily="@font/poppins_medium"
+        android:icon="@drawable/ic_profilee"
+        android:title="Profile" />
+</menu>

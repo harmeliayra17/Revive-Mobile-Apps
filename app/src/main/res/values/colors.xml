@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="inactive_grey">#A0A0A0</color>
+
+    <color name="color_primary">#912121</color> <!-- warna utama -->
+    <color name="color_on_primary">#FFFFFF</color>
+
+    <color name="color_background">#FFFFFF</color>
+    <color name="color_on_background">#000000</color>
+
+    <color name="color_surface">#FFFFFF</color>
+    <color name="color_on_surface">#000000</color>
+
+    <color name="selected_tab_text_color">#912121</color>
+</resources>

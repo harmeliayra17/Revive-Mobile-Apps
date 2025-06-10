@@ -1,0 +1,6 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Saat item dipilih -->
+    <item android:drawable="@android:color/transparent" android:state_checked="true" />
+    <!-- Default -->
+    <item android:drawable="@android:color/transparent" />
+</selector>

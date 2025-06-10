@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header with Back Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <ImageView
+                android:id="@+id/ivBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/back1"
+                android:tint="#912121" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Exercise Timer"
+                android:textColor="#912121"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Exercise Image -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="0dp">
+
+            <!-- Exercise Name -->
+            <TextView
+                android:id="@+id/tvExerciseName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:fontFamily="@font/poppins_bold"
+                android:gravity="center"
+                android:text="Exercise Name"
+                android:textColor="#912121"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Motivational Text -->
+            <TextView
+                android:id="@+id/tvMotivation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:fontFamily="@font/poppins_medium"
+                android:gravity="center"
+                android:text="Push your limits, embrace the challenge!"
+                android:textColor="#666666"
+                android:textSize="14sp"
+                android:textStyle="italic" />
+
+        </LinearLayout>
+
+        <!-- Timer Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Duration Display -->
+            <TextView
+                android:id="@+id/tvDuration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="18dp"
+                android:fontFamily="@font/poppins_medium"
+                android:gravity="center"
+                android:text="Select duration above"
+                android:textColor="#666666"
+                android:textSize="16sp" />
+
+            <!-- Timer Circle -->
+            <RelativeLayout
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_marginBottom="32dp">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progress="100"
+                    android:progressDrawable="@drawable/circular_progress_bar" />
+
+                <TextView
+                    android:id="@+id/tvTimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="--:--"
+                    android:textColor="#912121"
+                    android:textSize="44sp"
+                    android:textStyle="bold" />
+
+            </RelativeLayout>
+
+            <!-- Control Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnPlayPause"
+                    android:layout_width="120dp"
+                    android:layout_height="56dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/play_button_text_selector"
+                    android:clickable="true"
+                    android:enabled="false"
+                    android:focusable="true"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:gravity="center"
+                    android:text="Start"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnStop"
+                    android:layout_width="120dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/stop_button_text_selector"
+                    android:clickable="true"
+                    android:enabled="false"
+                    android:focusable="true"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:gravity="center"
+                    android:text="Stop"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Duration Selection -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="Select Duration:"
+                    android:textColor="#333333"
+                    android:textSize="16sp" />
+
+                <!-- First Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/btn30Sec"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/duration_button_white_selector"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/poppins_medium"
+                        android:gravity="center"
+                        android:text="30s"
+                        android:textColor="#912121"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/btn1Min"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/duration_button_white_selector"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/poppins_medium"
+                        android:gravity="center"
+                        android:text="1m"
+                        android:textColor="#912121"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/btn2Min"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/duration_button_white_selector"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/poppins_medium"
+                        android:gravity="center"
+                        android:text="2m"
+                        android:textColor="#912121"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/btn3Min"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/duration_button_white_selector"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/poppins_medium"
+                        android:gravity="center"
+                        android:text="3m"
+                        android:textColor="#912121"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <!-- Second Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/btn4Min"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/duration_button_white_selector"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/poppins_medium"
+                        android:gravity="center"
+                        android:text="4m"
+                        android:textColor="#912121"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/btn5Min"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/duration_button_white_selector"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/poppins_medium"
+                        android:gravity="center"
+                        android:text="5m"
+                        android:textColor="#912121"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/btn10Min"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/duration_button_white_selector"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/poppins_medium"
+                        android:gravity="center"
+                        android:text="10m"
+                        android:textColor="#912121"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/btnCustom"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/duration_button_white_selector"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/poppins_medium"
+                        android:gravity="center"
+                        android:text="Custom"
+                        android:textColor="#912121"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Tips Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/rounded_button_outline"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:text="💡 Exercise Tips"
+                    android:textColor="#912121"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_regular"
+                    android:lineSpacingMultiplier="1.2"
+                    android:text="• Focus on proper form over speed\n• Breathe steadily throughout the exercise\n• Listen to your body and rest when needed\n• Stay hydrated during your workout"
+                    android:textColor="#666666"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

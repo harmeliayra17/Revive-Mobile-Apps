@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <!-- Konten Utama -->
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_navigation" />
+
+    <!-- Garis Pemisah -->
+    <View
+        android:id="@+id/nav_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1.5dp"
+        android:layout_above="@id/bottom_navigation"
+        android:background="#EBEBEB" />
+
+    <!-- FAB untuk Add Track -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add"
+        android:layout_width="78dp"
+        android:layout_height="78dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp"
+        android:contentDescription="Add Track"
+        android:elevation="8dp"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/color_primary"
+        app:maxImageSize="28dp"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Fab"
+        app:tint="@android:color/white" />
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        style="@style/CustomBottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:fontFamily="@font/poppins_medium"
+        android:textSize="12sp"
+        app:itemIconSize="26dp"
+        app:itemIconTint="@color/selector_nav_icon"
+        app:itemTextColor="@color/selector_nav_icon"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu" />
+
+</RelativeLayout>
