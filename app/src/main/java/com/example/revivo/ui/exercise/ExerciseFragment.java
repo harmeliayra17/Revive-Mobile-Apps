@@ -4,11 +4,10 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -18,14 +17,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.CheckBox;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,6 +43,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ExerciseFragment extends Fragment {
     private static final String TAG = "ExerciseFragment";
@@ -65,6 +65,9 @@ public class ExerciseFragment extends Fragment {
     private TextView tvSummaryMuscleGroupsCount;
     private TextView tvSummaryLevelCount;
 
+    // Executor for background search
+    private final ExecutorService searchExecutor = Executors.newSingleThreadExecutor();
+
     // Filter variables
     private List<Exercise> originalExercises = new ArrayList<>();
     private List<Exercise> filteredExercises = new ArrayList<>();
@@ -76,6 +79,12 @@ public class ExerciseFragment extends Fragment {
     private Set<String> selectedForceTypes = new HashSet<>();
     private Set<String> selectedMechanics = new HashSet<>();
     private Set<String> selectedCategories = new HashSet<>();
+    // Delay for search (debounce)
+    private final long SEARCH_DELAY_MS = 1200;
+    // Error reload
+    private TextView btnReload;
+    private Handler mainHandler;
+    private Runnable currentSearchRunnable;
 
     @Nullable
     @Override
@@ -95,6 +104,8 @@ public class ExerciseFragment extends Fragment {
     ) {
         super.onViewCreated(view, savedInstanceState);
         Log.d(TAG, "onViewCreated called");
+
+        mainHandler = new Handler(Looper.getMainLooper());
 
         initializeViews(view);
         setupRecyclerView();
@@ -123,6 +134,22 @@ public class ExerciseFragment extends Fragment {
         tvSummaryExerciseCount = view.findViewById(R.id.tv_summary_exercise_count);
         tvSummaryMuscleGroupsCount = view.findViewById(R.id.tv_summary_musclegroups_count);
         tvSummaryLevelCount = view.findViewById(R.id.tv_summary_level_count);
+
+        // Error reload button (dynamically add if needed)
+        btnReload = view.findViewById(R.id.btn_reload);
+        if (btnReload == null) {
+            btnReload = new Button(getContext());
+            btnReload.setId(View.generateViewId());
+            btnReload.setText("Reload");
+            btnReload.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white));
+            btnReload.setBackgroundResource(R.drawable.play_button_normal); // Or your custom style
+            btnReload.setVisibility(View.GONE);
+
+            // Assume tvErrorMessage's parent is LinearLayout
+            ViewGroup parent = (ViewGroup) tvErrorMessage.getParent();
+            int index = parent.indexOfChild(tvErrorMessage);
+            parent.addView(btnReload, index + 1);
+        }
     }
 
     private void setupFilterTabs() {
@@ -181,17 +208,67 @@ public class ExerciseFragment extends Fragment {
     }
 
     private void setupSearchFunctionality() {
-        etSearch.addTextChangedListener(new TextWatcher() {
+        etSearch.addTextChangedListener(new android.text.TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterExercises(s.toString());
+                // Debounce: Cancel pending runnable
+                if (currentSearchRunnable != null) {
+                    mainHandler.removeCallbacks(currentSearchRunnable);
+                }
+                final String searchText = s.toString();
+                // Jalankan pencarian di background thread setelah delay
+                currentSearchRunnable = () -> searchExecutor.submit(() -> {
+                    applyAllFiltersInBackground(searchText);
+                });
+                mainHandler.postDelayed(currentSearchRunnable, SEARCH_DELAY_MS);
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(android.text.Editable s) {}
+        });
+    }
+
+    // Gunakan background thread untuk pencarian/filter
+    private void applyAllFiltersInBackground(String searchQuery) {
+        List<Exercise> result = new ArrayList<>(originalExercises);
+
+        // Apply level filter from tabs
+        if (!currentLevelFilter.equals("All")) {
+            List<Exercise> levelFiltered = new ArrayList<>();
+            for (Exercise exercise : result) {
+                if (exercise.getLevel() != null &&
+                        exercise.getLevel().toLowerCase().equals(currentLevelFilter.toLowerCase())) {
+                    levelFiltered.add(exercise);
+                }
+            }
+            result = levelFiltered;
+        }
+
+        // Apply search filter
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            List<Exercise> searchResult = new ArrayList<>();
+            String query = searchQuery.toLowerCase().trim();
+            for (Exercise exercise : result) {
+                if (exercise.getName() != null &&
+                        exercise.getName().toLowerCase().contains(query)) {
+                    searchResult.add(exercise);
+                }
+            }
+            result = searchResult;
+        }
+
+        // Apply category filters
+        result = applyFilters(result);
+
+        filteredExercises = result;
+        // Update UI di main thread
+        mainHandler.post(() -> {
+            adapter.submitList(new ArrayList<>(filteredExercises));
+            updateSummary(filteredExercises);
+            updateFilterButtonAppearance();
         });
     }
 
@@ -226,10 +303,12 @@ public class ExerciseFragment extends Fragment {
                 originalExercises = new ArrayList<>(exercises);
                 applyAllFilters();
                 tvErrorMessage.setVisibility(View.GONE);
+                btnReload.setVisibility(View.GONE);
                 rvExercises.setVisibility(View.VISIBLE);
             } else {
                 tvErrorMessage.setText("No exercise data found.");
                 tvErrorMessage.setVisibility(View.VISIBLE);
+                btnReload.setVisibility(View.VISIBLE);
                 rvExercises.setVisibility(View.GONE);
                 clearSummary();
             }
@@ -253,57 +332,30 @@ public class ExerciseFragment extends Fragment {
                 }
                 tvErrorMessage.setText(errorMessage);
                 tvErrorMessage.setVisibility(View.VISIBLE);
+                btnReload.setVisibility(View.VISIBLE);
                 rvExercises.setVisibility(View.GONE);
                 clearSummary();
             } else {
                 tvErrorMessage.setVisibility(View.GONE);
+                btnReload.setVisibility(View.GONE);
             }
+        });
+
+        btnReload.setOnClickListener(v -> {
+            // Reload data
+            viewModel.reloadExercises();
+            btnReload.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
         });
     }
 
     private void filterExercises(String searchQuery) {
-        applyAllFilters(searchQuery);
+        // Jalankan pencarian di background thread
+        searchExecutor.submit(() -> applyAllFiltersInBackground(searchQuery));
     }
 
     private void applyAllFilters() {
-        applyAllFilters(etSearch.getText().toString());
-    }
-
-    private void applyAllFilters(String searchQuery) {
-        List<Exercise> result = new ArrayList<>(originalExercises);
-
-        // Apply level filter from tabs
-        if (!currentLevelFilter.equals("All")) {
-            List<Exercise> levelFiltered = new ArrayList<>();
-            for (Exercise exercise : result) {
-                if (exercise.getLevel() != null &&
-                        exercise.getLevel().toLowerCase().equals(currentLevelFilter.toLowerCase())) {
-                    levelFiltered.add(exercise);
-                }
-            }
-            result = levelFiltered;
-        }
-
-        // Apply search filter
-        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-            List<Exercise> searchResult = new ArrayList<>();
-            String query = searchQuery.toLowerCase().trim();
-            for (Exercise exercise : result) {
-                if (exercise.getName() != null &&
-                        exercise.getName().toLowerCase().contains(query)) {
-                    searchResult.add(exercise);
-                }
-            }
-            result = searchResult;
-        }
-
-        // Apply category filters
-        result = applyFilters(result);
-
-        filteredExercises = result;
-        adapter.submitList(new ArrayList<>(filteredExercises));
-        updateSummary(filteredExercises);
-        updateFilterButtonAppearance();
+        filterExercises(etSearch.getText().toString());
     }
 
     private List<Exercise> applyFilters(List<Exercise> exercises) {
@@ -439,8 +491,6 @@ public class ExerciseFragment extends Fragment {
         // Get screen dimensions for proper sizing
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int screenHeight = displayMetrics.heightPixels;
-        int screenWidth = displayMetrics.widthPixels;
 
         // Create the main container with rounded corners
         LinearLayout dialogContainer = new LinearLayout(getContext());
@@ -544,7 +594,6 @@ public class ExerciseFragment extends Fragment {
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonLayout.setLayoutParams(buttonLayoutParams);
 
-
         // Clear All button (left)
         Button clearAllButton = new Button(getContext());
         clearAllButton.setText("Clear All");
@@ -592,11 +641,8 @@ public class ExerciseFragment extends Fragment {
 
         AlertDialog dialog = builder.create();
 
-
         // Set button click listeners
         closeButton.setOnClickListener(v -> dialog.dismiss());
-
-
         clearAllButton.setOnClickListener(v -> {
             clearAllFilters();
             applyAllFilters();
@@ -735,7 +781,6 @@ public class ExerciseFragment extends Fragment {
         Set<String> muscles = new HashSet<>();
         for (Exercise exercise : originalExercises) {
             if (exercise.getPrimaryMuscles() != null) {
-                // Clean the muscle string by removing brackets and quotes
                 String cleanMuscle = cleanPrimaryMuscleString(exercise.getPrimaryMuscles().toString());
                 if (!cleanMuscle.isEmpty()) {
                     muscles.add(cleanMuscle);

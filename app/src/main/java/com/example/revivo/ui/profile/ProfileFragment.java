@@ -8,12 +8,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.ImageView;
+
 import androidx.fragment.app.Fragment;
-import androidx.cardview.widget.CardView;
+
 import com.example.revivo.R;
 import com.example.revivo.data.local.database.DatabaseHelper;
 import com.example.revivo.data.local.database.DatabaseContract;
@@ -21,6 +20,11 @@ import com.example.revivo.SignInActivity;
 import com.example.revivo.ui.profile.detail.EditProfileActivity;
 import com.example.revivo.ui.profile.detail.MyTargetsActivity;
 import com.example.revivo.ui.profile.detail.SettingsActivity;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class ProfileFragment extends Fragment {
 
@@ -47,7 +51,6 @@ public class ProfileFragment extends Fragment {
         tvUserName = view.findViewById(R.id.tv_user_name);
         tvWeight = view.findViewById(R.id.tv_weight);
         tvHeight = view.findViewById(R.id.tv_height);
-        tvAge = view.findViewById(R.id.tv_age);
         btnEdit = view.findViewById(R.id.btn_edit);
         cvMyTarget = view.findViewById(R.id.cv_my_target);
         cvSettings = view.findViewById(R.id.cv_settings);
@@ -90,31 +93,13 @@ public class ProfileFragment extends Fragment {
             String birthDate = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Users.COLUMN_BIRTH_DATE));
 
             tvUserName.setText(name != null ? name : "User");
-            tvWeight.setText(String.format("%.0f kg", weight));
-            tvHeight.setText(String.format("%.0f cm", height));
-
-            // Calculate age from birth date
-            int age = calculateAge(birthDate);
-            tvAge.setText(String.valueOf(age));
+            tvWeight.setText(String.format(Locale.getDefault(), "%.0f kg", weight));
+            tvHeight.setText(String.format(Locale.getDefault(), "%.0f cm", height));
 
             cursor.close();
         }
 
         db.close();
-    }
-
-    private int calculateAge(String birthDate) {
-        // Simple age calculation - you might want to implement proper date calculation
-        if (birthDate == null || birthDate.isEmpty()) return 0;
-
-        try {
-            String[] parts = birthDate.split("-");
-            int birthYear = Integer.parseInt(parts[0]);
-            int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-            return currentYear - birthYear;
-        } catch (Exception e) {
-            return 25; // Default age
-        }
     }
 
     private void setupClickListeners() {
@@ -148,7 +133,7 @@ public class ProfileFragment extends Fragment {
         Intent intent = new Intent(getContext(), SignInActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-        getActivity().finish();
+        if (getActivity() != null) getActivity().finish();
     }
 
     @Override

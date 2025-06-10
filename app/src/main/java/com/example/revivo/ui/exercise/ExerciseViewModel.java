@@ -57,4 +57,9 @@ public class ExerciseViewModel extends ViewModel {
             }
         });
     }
+
+    // Tambahkan ini agar bisa dipanggil reloadExercises() dari fragment
+    public void reloadExercises() {
+        loadExercises();
+    }
 }

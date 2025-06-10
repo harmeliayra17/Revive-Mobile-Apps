@@ -1,6 +1,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,48 +11,115 @@
         android:gravity="center_horizontal"
         android:layout_gravity="center">
 
+        <!-- Judul dan deskripsi -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="Add Your Activity Log"
+            android:textColor="@color/color_primary"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:gravity="center"
+            android:lineSpacingExtra="2dp"
+            android:text="Catat langkah, minum air, dan tidurmu hari ini untuk hidup lebih sehat."
+            android:textColor="@color/inactive_grey"
+            android:textSize="14sp"/>
+
+        <!-- Input Steps -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="Steps Today"
+            android:textColor="@color/color_primary"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
         <EditText
             android:id="@+id/et_steps"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:hint="Steps Today"
+            android:hint="Masukkan jumlah langkah"
             android:inputType="number"
             android:background="@drawable/edittext_background"
             android:paddingHorizontal="12dp"
             android:textSize="14sp" />
 
+        <!-- Input Water -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"
+            android:text="Water Intake (ml)"
+            android:textColor="@color/color_primary"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
         <EditText
             android:id="@+id/et_water_intake"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:hint="Water Intake (ml)"
+            android:hint="Masukkan konsumsi air (ml)"
             android:inputType="number"
             android:background="@drawable/edittext_background"
             android:paddingHorizontal="12dp"
+            android:textSize="14sp" />
+
+        <!-- Input Sleep -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"
             android:textSize="14sp"
-            android:layout_marginTop="12dp" />
+            android:text="Sleep Duration (hours)"
+            android:textColor="@color/color_primary"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/et_sleep_duration"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:hint="Sleep Duration (hours)"
+            android:hint="Masukkan lama tidur (jam)"
             android:inputType="numberDecimal"
             android:background="@drawable/edittext_background"
             android:paddingHorizontal="12dp"
-            android:textSize="14sp"
-            android:layout_marginTop="12dp" />
+            android:textSize="14sp" />
 
+        <!-- Info -->
+        <TextView
+            android:id="@+id/tvInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="start"
+            android:text="Pastikan data yang kamu masukkan sesuai aktivitas hari ini."
+            android:textColor="@color/inactive_grey"
+            android:textSize="12sp" />
+
+        <!-- Tombol -->
         <Button
             android:id="@+id/btn_save"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Save"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="20dp"
+            android:text="Save Log"
             android:backgroundTint="@color/color_primary"
             android:textColor="@android:color/white"
             android:textAllCaps="false"
             android:paddingVertical="12dp"
             android:textSize="16sp" />
+
     </LinearLayout>
 </ScrollView>

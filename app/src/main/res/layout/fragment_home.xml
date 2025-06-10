@@ -16,14 +16,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -42,9 +41,7 @@
                     android:textColor="#333333"
                     android:textSize="18sp"
                     android:textStyle="bold" />
-
             </LinearLayout>
-
         </LinearLayout>
 
         <!-- Title Section -->
@@ -58,251 +55,280 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
+        <!-- Daily Targets Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="Daily Summary"
-            android:textColor="#333333"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:layout_marginBottom="20dp"
+            android:text="Set and track your daily health goals"
+            android:textColor="@color/inactive_grey"
+            android:textSize="14sp" />
 
-        <!-- Health Cards Grid -->
+        <!-- Exercise Card (DULU Steps, SEKARANG Exercise) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/redbg"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="12dp"
+                android:src="@drawable/ic_exercise"
+                android:tint="@color/white" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_exercise_log"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="20 min"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="/"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_exercise_target"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="30 min"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Exercise"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- 3 Cards in 1 Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            >
 
-            <!-- First Row -->
+            <!-- Steps Card -->
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:orientation="horizontal">
+                android:layout_width="0dp"
+                android:layout_height="160dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_button_outline"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
 
-                <!-- Exercise Time Card -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="140dp"
-                    android:layout_marginEnd="6dp"
-                    android:layout_weight="1"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/ic_step"
+                    android:tint="@color/color_primary" />
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/redbg"
-                        android:padding="16dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                        <!-- Content -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tv_steps_log"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:text="10,000"
+                        android:textColor="@color/color_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:orientation="vertical">
+                            android:layout_marginEnd="4dp"
+                            android:text="/"
+                            android:textColor="@color/color_primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
 
-                            <ImageView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_marginBottom="12dp"
-                                android:padding="10dp"
-                                android:src="@drawable/ic_exercises"
-                                app:tint="@color/white" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="4dp"
-                                android:text="Exercise Time"
-                                android:textColor="@android:color/white"
-                                android:textSize="13sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvExerciseTime"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="32 min / 45 min"
-                                android:textColor="#FFE0E0"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
-
-                    </RelativeLayout>
-
-                </androidx.cardview.widget.CardView>
-
-                <!-- Steps Count Card -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="140dp"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/redbg"
-                        android:padding="16dp">
-
-                        <!-- Content -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:id="@+id/tv_steps_target"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:orientation="vertical">
+                            android:text="10,000"
+                            android:textColor="@color/color_primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
 
-                            <ImageView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_marginBottom="12dp"
-                                android:padding="10dp"
-                                android:src="@drawable/ic_step"
-                                />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="4dp"
-                                android:text="Steps Count"
-                                android:textColor="@android:color/white"
-                                android:textSize="13sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvStepsCount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="3,800 / 8,000"
-                                android:textColor="#E3F2FD"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
-
-                    </RelativeLayout>
-
-                </androidx.cardview.widget.CardView>
-
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Steps"
+                    android:textColor="@color/inactive_grey"
+                    android:textSize="10sp" />
             </LinearLayout>
 
-            <!-- Second Row -->
+            <!-- Water Card -->
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:orientation="horizontal">
+                android:layout_width="0dp"
+                android:layout_height="160dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_button_outline"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
 
-                <!-- Water Intake Card -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="140dp"
-                    android:layout_marginEnd="6dp"
-                    android:layout_weight="1"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/ic_water"
+                    android:tint="#912121" />
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/redbg"
-                        android:padding="16dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                        <!-- Content -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tv_water_log"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:text="1500 ml"
+                        android:textColor="#912121"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:orientation="vertical">
+                            android:layout_marginEnd="4dp"
+                            android:text="/"
+                            android:textColor="#912121"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
 
-                            <ImageView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_marginBottom="12dp"
-                                android:padding="10dp"
-                                android:src="@drawable/ic_water"
-                                />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="4dp"
-                                android:text="Water Intake"
-                                android:textColor="@android:color/white"
-                                android:textSize="13sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvWaterIntake"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="1.5L / 2.5L"
-                                android:textColor="#FFFFFF"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
-
-                    </RelativeLayout>
-
-                </androidx.cardview.widget.CardView>
-
-                <!-- Sleep Duration Card -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="140dp"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/redbg"
-                        android:padding="16dp">
-
-                        <!-- Content -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:id="@+id/tv_water_target"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:orientation="vertical">
+                            android:text="2000 ml"
+                            android:textColor="#912121"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
 
-                            <ImageView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_marginBottom="12dp"
-                                android:padding="10dp"
-                                android:src="@drawable/ic_sleep"
-                                />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="4dp"
-                                android:text="Sleep Duration"
-                                android:textColor="@android:color/white"
-                                android:textSize="13sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvSleepDuration"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="7h / 8h"
-                                android:textColor="#F3E5F5"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
-
-                    </RelativeLayout>
-
-                </androidx.cardview.widget.CardView>
-
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Water"
+                    android:textColor="@color/inactive_grey"
+                    android:textSize="10sp" />
             </LinearLayout>
 
+            <!-- Sleep Card -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="160dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_button_outline"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/ic_sleep"
+                    android:tint="@color/color_primary" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_sleep_log"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:text="6.5 hr"
+                        android:textColor="@color/color_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="4dp"
+                            android:text="/"
+                            android:textColor="@color/color_primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_sleep_target"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="8.0 hr"
+                            android:textColor="@color/color_primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sleep"
+                    android:textColor="@color/inactive_grey"
+                    android:textSize="10sp" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Notification Card -->
@@ -311,6 +337,7 @@
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@android:color/white"
             app:cardCornerRadius="16dp"
+            android:layout_marginTop="0dp"
             app:cardElevation="4dp">
 
             <LinearLayout
@@ -324,10 +351,10 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:padding="10dp"
-                    android:src="@drawable/lamp"
-                    />
+                    android:src="@drawable/lamp" />
 
                 <TextView
+                    android:id="@+id/tvMotivation"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
@@ -336,11 +363,8 @@
                     android:text="Your body needs water to function optimally! Let's drink a glass of water now."
                     android:textColor="#333333"
                     android:textSize="14sp" />
-
             </LinearLayout>
-
         </androidx.cardview.widget.CardView>
 
     </LinearLayout>
-
 </ScrollView>

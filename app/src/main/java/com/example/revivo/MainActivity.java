@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,37 +16,35 @@ import com.example.revivo.ui.add.AddActivityLogFragment;
 import com.example.revivo.ui.exercise.ExerciseFragment;
 import com.example.revivo.ui.home.HomeFragment;
 import com.example.revivo.ui.profile.ProfileFragment;
+import com.example.revivo.ui.stats.StatsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
+    private FloatingActionButton fabAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Cek login
         if (!isUserLoggedIn()) {
-            Intent intent = new Intent(MainActivity.this, SignInActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(MainActivity.this, SignInActivity.class));
             finish();
             return;
         }
 
         setContentView(R.layout.activity_main);
 
-        // Inisialisasi database
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.close();
 
-        // Inisialisasi komponen
         bottomNavigationView = findViewById(R.id.bottom_navigation);
+        fabAdd = findViewById(R.id.fab_add);
 
-
-        // Default fragment saat pertama kali dibuka
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment());
         }
@@ -54,17 +53,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 Fragment fragment = null;
-
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.nav_home) {
                     fragment = new HomeFragment();
                 } else if (itemId == R.id.nav_exercise) {
                     fragment = new ExerciseFragment();
+                } else if (itemId == R.id.nav_Stats) {
+                    fragment = new StatsFragment();
                 } else if (itemId == R.id.nav_profile) {
                     fragment = new ProfileFragment();
-                } else if (itemId == R.id.nav_add ) {
-                    fragment = new AddActivityLogFragment();
                 }
 
                 if (fragment != null) {
@@ -75,24 +73,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        fabAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadFragment(new AddActivityLogFragment());
+            }
+        });
     }
 
     private boolean isUserLoggedIn() {
         SharedPreferences prefs = getSharedPreferences("user_session", MODE_PRIVATE);
         return prefs.getBoolean("is_logged_in", false);
-    }
-
-    private void logout() {
-        getSharedPreferences("user_session", MODE_PRIVATE)
-                .edit()
-                .clear()
-                .apply();
-
-        Intent intent = new Intent(MainActivity.this, SignInActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
     }
 
     private void loadFragment(Fragment fragment) {

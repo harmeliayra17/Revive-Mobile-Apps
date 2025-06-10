@@ -10,10 +10,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:background="@color/white"
         android:elevation="4dp"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
         android:padding="20dp">
 
         <ImageView
@@ -21,57 +21,64 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/back1"
-            />
+            android:contentDescription="Back" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="28dp"
             android:layout_weight="1"
-            android:fontFamily="@font/poppins_semibold"
-            android:gravity="center"
             android:text="Settings"
             android:textColor="@color/color_primary"
+            android:layout_marginEnd="28dp"
             android:textSize="20sp"
+            android:fontFamily="@font/poppins_semibold"
+            android:gravity="center"
             android:textStyle="bold" />
 
     </LinearLayout>
 
-
-    <!-- Theme -->
+    <!-- Appearance Section -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Appearance"
         android:layout_margin="20dp"
         android:fontFamily="@font/poppins_bold"
-        android:text="Appearance"
-        android:textColor="@color/black"
         android:textSize="14sp"
+        android:textColor="@color/black"
         android:textStyle="bold" />
 
-    <RadioGroup
-        android:id="@+id/rg_theme"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/edittext_background"
         android:orientation="vertical"
+        android:layout_marginHorizontal="20dp"
+        android:background="@drawable/edittext_background"
         android:padding="16dp">
 
-        <RadioButton
-            android:id="@+id/rb_light"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Light Mode"
-            android:textColor="@color/color_primary" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp">
 
-        <RadioButton
-            android:id="@+id/rb_dark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Dark Mode"
-            android:textColor="@color/color_primary" />
-    </RadioGroup>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Dark Theme"
+                android:textColor="@color/color_primary"
+                android:textSize="16sp" />
+
+            <Switch
+                android:id="@+id/switch_theme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:thumbTint="@color/color_primary"
+                android:trackTint="@color/inactive_grey" />
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

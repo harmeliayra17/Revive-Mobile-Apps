@@ -302,6 +302,19 @@
         android:textSize="16sp"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/btn_reload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/button_background"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="Reload"
+        android:textColor="@android:color/white"
+        android:visibility="gone"/>
+
     <!-- RecyclerView for Workout Cards -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewWorkouts"

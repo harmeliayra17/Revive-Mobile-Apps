@@ -1,0 +1,37 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="28dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingVertical="2dp">
+
+    <TextView
+        android:id="@+id/tvDay"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Sen"
+        android:textColor="#222"
+        android:textSize="12sp"
+        android:textStyle="bold"/>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="14dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_weight="1"
+        android:background="#EBEBEB"
+        android:progress="0"
+        android:progressTint="@color/color_primary"/>
+
+    <TextView
+        android:id="@+id/tvValue"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:text="0 steps"
+        android:textColor="#555"
+        android:textSize="12sp"/>
+</LinearLayout>

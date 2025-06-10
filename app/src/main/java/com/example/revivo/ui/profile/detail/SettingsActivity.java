@@ -1,54 +1,49 @@
 package com.example.revivo.ui.profile.detail;
 
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.Switch;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-
-import android.os.Bundle;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-
 import com.example.revivo.R;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private RadioGroup rgTheme;
-    private RadioButton rbLight, rbDark;
+    private Switch switchTheme;
+    private ImageView ivBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Load saved theme before setting content view
-        if (getSharedPreferences("settings", MODE_PRIVATE).getBoolean("dark_mode", false)) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
+        // Terapkan theme sesuai preferensi sebelum setContentView
+        SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
+        boolean isDark = prefs.getBoolean("dark_mode", false);
+        AppCompatDelegate.setDefaultNightMode(isDark
+                ? AppCompatDelegate.MODE_NIGHT_YES
+                : AppCompatDelegate.MODE_NIGHT_NO);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        rgTheme = findViewById(R.id.rg_theme);
-        rbLight = findViewById(R.id.rb_light);
-        rbDark = findViewById(R.id.rb_dark);
+        switchTheme = findViewById(R.id.switch_theme);
+        ivBack = findViewById(R.id.iv_back);
 
-        // Set selected state based on saved preference
-        boolean isDark = getSharedPreferences("settings", MODE_PRIVATE)
-                .getBoolean("dark_mode", false);
+        // Set Switch sesuai preferensi
+        switchTheme.setChecked(isDark);
 
-        if (isDark) rbDark.setChecked(true);
-        else rbLight.setChecked(true);
-
-        rgTheme.setOnCheckedChangeListener((group, checkedId) -> {
-            boolean selectedDark = checkedId == R.id.rb_dark;
+        // Listener untuk Switch
+        switchTheme.setOnCheckedChangeListener((buttonView, isChecked) -> {
             AppCompatDelegate.setDefaultNightMode(
-                    selectedDark ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+                    isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
 
-            // Save preference
-            getSharedPreferences("settings", MODE_PRIVATE)
-                    .edit()
-                    .putBoolean("dark_mode", selectedDark)
-                    .apply();
+            // Simpan preferensi
+            prefs.edit().putBoolean("dark_mode", isChecked).apply();
 
-            recreate(); // Restart to apply theme
+            // Opsional: restart activity biar efek langsung
+            recreate();
         });
+
+        // Tombol kembali
+        ivBack.setOnClickListener(v -> finish());
     }
 }

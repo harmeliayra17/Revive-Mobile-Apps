@@ -13,8 +13,14 @@
         android:id="@+id/nav_add"
         android:enabled="true"
         android:fontFamily="@font/poppins_medium"
-        android:icon="@drawable/ic_add"
+        android:icon="@drawable/ic_transparent"
         android:title="Add Track" />
+    <item
+        android:id="@+id/nav_Stats"
+        android:enabled="true"
+        android:fontFamily="@font/poppins_medium"
+        android:icon="@drawable/ic_progress"
+        android:title="Stats" />
 
     <item
         android:id="@+id/nav_profile"
