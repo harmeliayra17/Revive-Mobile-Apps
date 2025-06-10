@@ -60,4 +60,5 @@ public class ActivityLogHelper {
         return db.query(TABLE, null, null, null, null, null,
                 DatabaseContract.ActivityLog.COLUMN_DATE + " ASC");
     }
+
 }

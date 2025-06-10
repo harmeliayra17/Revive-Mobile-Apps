@@ -24,7 +24,6 @@ public class TimeActivity extends AppCompatActivity {
 
     public static final String EXTRA_EXERCISE_NAME = "exercise_name";
     public static final String EXTRA_EXERCISE_ID = "exercise_id";
-    public static final String EXTRA_DURATION_MINUTES = "duration_minutes";
 
     private ImageView ivBack;
     private TextView tvExerciseName, tvTimer, tvDuration, tvMotivation;
@@ -41,13 +40,12 @@ public class TimeActivity extends AppCompatActivity {
     private boolean isTimerSet = false;
 
     private String exerciseName, exerciseId;
-    private int durationMinutes;
-    private long startTime; // For tracking actual exercise time
+    private float durationMinutes = 0;
+    private long startTime;
 
     private ExerciseLogHelper exerciseLogHelper;
     private ActivityLogHelper activityLogHelper;
 
-    // Motivational quotes
     private String[] motivationalQuotes = {
             "Push your limits, embrace the challenge!",
             "Every rep counts towards your goals!",
@@ -64,11 +62,8 @@ public class TimeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_time);
 
-        // Init DB helpers
-        exerciseLogHelper = new ExerciseLogHelper(this);
-        activityLogHelper = new ActivityLogHelper(this);
-        exerciseLogHelper.open();
-        activityLogHelper.open();
+        exerciseLogHelper = new ExerciseLogHelper(this); exerciseLogHelper.open();
+        activityLogHelper = new ActivityLogHelper(this); activityLogHelper.open();
 
         initViews();
         getIntentData();
@@ -81,8 +76,6 @@ public class TimeActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (countDownTimer != null) countDownTimer.cancel();
-
-        // Close helpers when destroying
         if (exerciseLogHelper != null) exerciseLogHelper.close();
         if (activityLogHelper != null) activityLogHelper.close();
     }
@@ -97,7 +90,6 @@ public class TimeActivity extends AppCompatActivity {
         btnPlayPause = findViewById(R.id.btnPlayPause);
         btnStop = findViewById(R.id.btnStop);
 
-        // Duration buttons
         btn30Sec = findViewById(R.id.btn30Sec);
         btn1Min = findViewById(R.id.btn1Min);
         btn2Min = findViewById(R.id.btn2Min);
@@ -106,13 +98,15 @@ public class TimeActivity extends AppCompatActivity {
         btn5Min = findViewById(R.id.btn5Min);
         btn10Min = findViewById(R.id.btn10Min);
         btnCustom = findViewById(R.id.btnCustom);
+
+        btnPlayPause.setEnabled(false);
+        btnStop.setEnabled(false);
     }
 
     private void getIntentData() {
         Intent intent = getIntent();
         exerciseName = intent.getStringExtra(EXTRA_EXERCISE_NAME);
         exerciseId = intent.getStringExtra(EXTRA_EXERCISE_ID);
-
         tvExerciseName.setText(exerciseName != null ? exerciseName : "Exercise");
     }
 
@@ -127,9 +121,7 @@ public class TimeActivity extends AppCompatActivity {
             else startTimer();
         });
 
-        btnStop.setOnClickListener(v -> {
-            stopTimer();
-        });
+        btnStop.setOnClickListener(v -> stopTimer());
     }
 
     private void setupDurationButtons() {
@@ -143,27 +135,13 @@ public class TimeActivity extends AppCompatActivity {
         btnCustom.setOnClickListener(v -> showCustomDurationDialog());
     }
 
-    private void setRandomMotivationalQuote() {
-        int randomIndex = (int) (Math.random() * motivationalQuotes.length);
-        tvMotivation.setText(motivationalQuotes[randomIndex]);
-    }
-
     private void selectDuration(TextView button, float minutes) {
-        // Reset previous selection
-        if (selectedDurationButton != null) {
-            selectedDurationButton.setSelected(false);
-        }
+        if (selectedDurationButton != null) selectedDurationButton.setSelected(false);
+        selectedDurationButton = button; button.setSelected(true);
 
-        // Set new selection
-        selectedDurationButton = button;
-        button.setSelected(true);
-
-        durationMinutes = (int) minutes;
-        if (minutes < 1) {
-            tvDuration.setText("30 seconds");
-        } else {
-            tvDuration.setText((int) minutes + " minute" + (minutes > 1 ? "s" : ""));
-        }
+        durationMinutes = minutes;
+        if (minutes < 1) tvDuration.setText("30 seconds");
+        else tvDuration.setText((int) minutes + " minute" + (minutes > 1 ? "s" : ""));
 
         setupTimer();
         btnPlayPause.setEnabled(true);
@@ -174,9 +152,8 @@ public class TimeActivity extends AppCompatActivity {
     private void showCustomDurationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Custom Duration");
-
         final EditText input = new EditText(this);
-        input.setHint("Enter minutes (e.g., 15)");
+        input.setHint("Enter minutes (1-60)");
         builder.setView(input);
 
         builder.setPositiveButton("OK", (dialog, which) -> {
@@ -186,23 +163,24 @@ public class TimeActivity extends AppCompatActivity {
                     selectDuration(btnCustom, customMinutes);
                     btnCustom.setText(customMinutes + "m");
                 } else {
-                    Toast.makeText(TimeActivity.this, "Please enter a value between 1-60 minutes", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Please enter a value between 1-60", Toast.LENGTH_SHORT).show();
                 }
             } catch (NumberFormatException e) {
-                Toast.makeText(TimeActivity.this, "Please enter a valid number", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show();
             }
         });
-
         builder.setNegativeButton("Cancel", null);
         builder.show();
     }
 
+    private void setRandomMotivationalQuote() {
+        int randomIndex = (int) (Math.random() * motivationalQuotes.length);
+        tvMotivation.setText(motivationalQuotes[randomIndex]);
+    }
+
     private void setupTimer() {
-        if (durationMinutes == 0) {
-            totalTimeInMillis = 30 * 1000L; // 30 seconds
-        } else {
-            totalTimeInMillis = durationMinutes * 60 * 1000L;
-        }
+        if (durationMinutes == 0.5f) totalTimeInMillis = 30 * 1000L;
+        else totalTimeInMillis = (long) (durationMinutes * 60 * 1000L);
         timeLeftInMillis = totalTimeInMillis;
         progressBar.setMax(100);
         updateTimerText();
@@ -211,12 +189,10 @@ public class TimeActivity extends AppCompatActivity {
 
     private void startTimer() {
         if (!isTimerSet) {
-            Toast.makeText(this, "Please select a duration first", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please select a duration", Toast.LENGTH_SHORT).show();
             return;
         }
-
         startTime = System.currentTimeMillis();
-
         countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -224,7 +200,6 @@ public class TimeActivity extends AppCompatActivity {
                 updateTimerText();
                 updateProgressBar();
             }
-
             @Override
             public void onFinish() {
                 isTimerRunning = false;
@@ -235,59 +210,35 @@ public class TimeActivity extends AppCompatActivity {
                 btnPlayPause.setEnabled(false);
                 btnStop.setEnabled(false);
                 Toast.makeText(TimeActivity.this, "Exercise completed! Well done!", Toast.LENGTH_LONG).show();
-
-                // Change motivational quote
                 setRandomMotivationalQuote();
-
-                // Calculate actual exercise time with floor rounding
-                long elapsedTime = System.currentTimeMillis() - startTime;
-                double actualMinutes = elapsedTime / 60000.0;
-
-//                // Ensure minimum 1 minute if timer has been running
-//                if (actualMinutes < 1 && elapsedTime > 0) {
-//                    actualMinutes = 1;
-//                }
-
+                double actualMinutes = totalTimeInMillis / 60000.0;
                 saveExerciseLog(actualMinutes);
-
-                // Reset for next exercise
                 resetTimer();
             }
         }.start();
-
         isTimerRunning = true;
         btnPlayPause.setText("Pause");
     }
 
     private void pauseTimer() {
-        countDownTimer.cancel();
+        if (countDownTimer != null) countDownTimer.cancel();
         isTimerRunning = false;
         btnPlayPause.setText("Resume");
     }
 
     private void stopTimer() {
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
-
+        if (countDownTimer != null) countDownTimer.cancel();
         if (isTimerRunning && startTime > 0) {
-            // Calculate time with floor rounding
-            long elapsedTime = System.currentTimeMillis() - startTime;
-            int actualMinutes = (int) Math.floor(elapsedTime / 60000.0);
-
-            // If less than 1 minute but has been running, still save as 1 minute
-            if (actualMinutes < 1 && elapsedTime > 10000) { // more than 10 seconds
-                actualMinutes = 1;
-            }
-
+            long elapsed = System.currentTimeMillis() - startTime;
+            double actualMinutes = elapsed / 60000.0;
+            if (actualMinutes < 1 && elapsed > 10000) actualMinutes = 1;
             if (actualMinutes > 0) {
                 saveExerciseLog(actualMinutes);
-                Toast.makeText(this, "Exercise stopped. Logged " + actualMinutes + " minute(s)", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Exercise stopped. Logged " + (int) actualMinutes + " min", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Exercise too short to log", Toast.LENGTH_SHORT).show();
             }
         }
-
         isTimerRunning = false;
         resetTimer();
         setRandomMotivationalQuote();
@@ -329,63 +280,40 @@ public class TimeActivity extends AppCompatActivity {
     }
 
     private void saveExerciseLog(double actualMinutes) {
-        if (actualMinutes <= 0) {
-            return;
-        }
-
+        if (actualMinutes <= 0) return;
         try {
-            // Ensure helpers are open
-            if (exerciseLogHelper == null) {
-                exerciseLogHelper = new ExerciseLogHelper(this);
-                exerciseLogHelper.open();
-            }
+            String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+            long userId = 1L; // TODO: Get actual userId from session
 
-            if (activityLogHelper == null) {
-                activityLogHelper = new ActivityLogHelper(this);
-                activityLogHelper.open();
-            }
-
-            String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                    .format(new Date());
-            long userId = 1L; // Replace with actual userId
-
-            // 1) Insert to Exercise_Log
+            // 1. Insert to Exercise_Log
             long insertResult = exerciseLogHelper.insert(userId, exerciseId, exerciseName, actualMinutes);
 
             if (insertResult > 0) {
-                // 2) Calculate total duration for today
+                // 2. Totalkan hari ini
                 int totalDuration = exerciseLogHelper.sumDurationByDate(userId, today);
 
-                // 3) Upsert to Activity_Log
+                // 3. Upsert ke Activity_Log
                 int updated = activityLogHelper.update(userId, today,
                         0, // steps
-                        totalDuration, // exerciseMin
-                        0, // waterMl
-                        0f); // sleepHr
-
+                        totalDuration, // exercise min
+                        0, // water
+                        0f // sleep
+                );
                 if (updated == 0) {
                     activityLogHelper.insert(userId, today, 0, totalDuration, 0, 0f);
                 }
-
-                Toast.makeText(this,
-                        "Logged " + actualMinutes + " min. Total today: " + totalDuration + " min",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Logged " + (int) actualMinutes + " min. Total today: " + totalDuration + " min", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Failed to save exercise log", Toast.LENGTH_SHORT).show();
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
             Toast.makeText(this, "Error saving exercise log: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onBackPressed() {
-        if (isTimerRunning) {
-            showExitConfirmationDialog();
-        } else {
-            super.onBackPressed();
-        }
+        if (isTimerRunning) showExitConfirmationDialog();
+        else super.onBackPressed();
     }
 }

@@ -81,7 +81,8 @@ public class StatsFragment extends Fragment {
                 DatabaseContract.ActivityLog.COLUMN_DATE + ", " +
                 DatabaseContract.ActivityLog.COLUMN_STEPS + ", " +
                 DatabaseContract.ActivityLog.COLUMN_WATER_ML + ", " +
-                DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS +
+                DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS + ", " +
+                DatabaseContract.ActivityLog.COLUMN_EXERCISE_MIN +
                 " FROM " + DatabaseContract.ActivityLog.TABLE_NAME +
                 " WHERE " + DatabaseContract.ActivityLog.COLUMN_USER_ID + " = ?" +
                 " AND " + DatabaseContract.ActivityLog.COLUMN_DATE + " BETWEEN ? AND ?" +
@@ -91,19 +92,27 @@ public class StatsFragment extends Fragment {
                 String.valueOf(currentUserId), dateFrom, dateTo
         });
 
-        int totalSteps = 0, totalWater = 0;
+        int totalSteps = 0, totalWater = 0, totalExercise = 0;
         float totalSleep = 0f;
         int[] dailySteps = new int[7];
         int[] dailyWater = new int[7];
         float[] dailySleep = new float[7];
+        int[] dailyExercise = new int[7];
         String[] dailyDates = dates.clone();
 
         int count = 0;
         while (cursor.moveToNext()) {
             String date = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_DATE));
-            int steps = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_STEPS));
-            int water = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_WATER_ML));
-            float sleep = cursor.getFloat(cursor.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS));
+            // --- SAFE GETTER for all fields ---
+            int idxSteps   = cursor.getColumnIndex(DatabaseContract.ActivityLog.COLUMN_STEPS);
+            int idxWater   = cursor.getColumnIndex(DatabaseContract.ActivityLog.COLUMN_WATER_ML);
+            int idxSleep   = cursor.getColumnIndex(DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS);
+            int idxExercise= cursor.getColumnIndex(DatabaseContract.ActivityLog.COLUMN_EXERCISE_MIN);
+
+            int steps = (idxSteps >= 0 && !cursor.isNull(idxSteps)) ? cursor.getInt(idxSteps) : 0;
+            int water = (idxWater >= 0 && !cursor.isNull(idxWater)) ? cursor.getInt(idxWater) : 0;
+            float sleep = (idxSleep >= 0 && !cursor.isNull(idxSleep)) ? cursor.getFloat(idxSleep) : 0f;
+            int exercise = (idxExercise >= 0 && !cursor.isNull(idxExercise)) ? cursor.getInt(idxExercise) : 0;
 
             // Cari index sesuai tanggal
             int idx = -1;
@@ -117,11 +126,13 @@ public class StatsFragment extends Fragment {
                 dailySteps[idx] = steps;
                 dailyWater[idx] = water;
                 dailySleep[idx] = sleep;
+                dailyExercise[idx] = exercise;
             }
 
             totalSteps += steps;
             totalWater += water;
             totalSleep += sleep;
+            totalExercise += exercise;
             count++;
         }
         cursor.close();
@@ -131,7 +142,7 @@ public class StatsFragment extends Fragment {
         int avgSteps = count != 0 ? totalSteps / count : 0;
         int avgWater = count != 0 ? totalWater / count : 0;
         float avgSleep = count != 0 ? totalSleep / count : 0f;
-        int avgExercise = 0; // TODO: Tambahkan perhitungan exercise jika ada datanya
+        int avgExercise = count != 0 ? totalExercise / count : 0;
 
         tvAvgSteps.setText(String.valueOf(avgSteps));
         tvAvgExercise.setText(avgExercise + " min");
@@ -139,7 +150,7 @@ public class StatsFragment extends Fragment {
         tvAvgSleep.setText(String.format(Locale.getDefault(), "%.1f hr", avgSleep));
 
         displayDailyStepBars(dailyDates, dailySteps);
-        displayDailyDetails(dailyDates, dailySteps, dailyWater, dailySleep);
+        displayDailyDetails(dailyDates, dailySteps, dailyWater, dailySleep, dailyExercise);
     }
 
     private void displayDailyStepBars(String[] dailyDates, int[] dailySteps) {
@@ -165,14 +176,14 @@ public class StatsFragment extends Fragment {
         }
     }
 
-    private void displayDailyDetails(String[] dailyDates, int[] dailySteps, int[] dailyWater, float[] dailySleep) {
+    private void displayDailyDetails(String[] dailyDates, int[] dailySteps, int[] dailyWater, float[] dailySleep, int[] dailyExercise) {
         layoutDayStats.removeAllViews();
 
         for (int i = 0; i < 7; i++) {
             TextView tv = new TextView(getContext());
             String hari = getDayName(dailyDates[i]);
-            tv.setText(String.format(Locale.getDefault(), "%s (%s): %d steps, %d ml, %.1f hr",
-                    hari, dailyDates[i], dailySteps[i], dailyWater[i], dailySleep[i]));
+            tv.setText(String.format(Locale.getDefault(), "%s (%s): %d steps, %d ml, %.1f hr, %d min exercise",
+                    hari, dailyDates[i], dailySteps[i], dailyWater[i], dailySleep[i], dailyExercise[i]));
             tv.setTextSize(14f);
             tv.setTextColor(getResources().getColor(R.color.color_primary, null));
             tv.setPadding(0, 4, 0, 4);

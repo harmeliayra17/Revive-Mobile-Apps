@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,9 +36,7 @@ public class HomeFragment extends Fragment {
     private DatabaseHelper dbHelper;
     private long currentUserId;
 
-    public HomeFragment() {
-        // Required empty public constructor
-    }
+    public HomeFragment() {}
 
     @SuppressLint("MissingInflatedId")
     @Nullable
@@ -64,7 +63,7 @@ public class HomeFragment extends Fragment {
 
         if (currentUserId != -1) {
             setUserNameFromDatabase();
-            loadTodayTargetsAndLog();
+            loadTodayActivityLogAndTargets();
         } else {
             tvUserName.setText("User");
             Toast.makeText(getContext(), "User tidak dikenali", Toast.LENGTH_SHORT).show();
@@ -74,110 +73,115 @@ public class HomeFragment extends Fragment {
     }
 
     private void setUserNameFromDatabase() {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String[] projection = { DatabaseContract.Users.COLUMN_NAME };
-        String selection = DatabaseContract.Users._ID + " = ?";
-        String[] selectionArgs = { String.valueOf(currentUserId) };
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        try {
+            db = dbHelper.getReadableDatabase();
+            String[] projection = { DatabaseContract.Users.COLUMN_NAME };
+            String selection = DatabaseContract.Users._ID + " = ?";
+            String[] selectionArgs = { String.valueOf(currentUserId) };
 
-        Cursor cursor = db.query(
-                DatabaseContract.Users.TABLE_NAME,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-        );
+            cursor = db.query(
+                    DatabaseContract.Users.TABLE_NAME,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    null
+            );
 
-        if (cursor != null && cursor.moveToFirst()) {
-            String name = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Users.COLUMN_NAME));
-            tvUserName.setText(name);
-            cursor.close();
-        } else {
+            if (cursor != null && cursor.moveToFirst()) {
+                String name = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Users.COLUMN_NAME));
+                tvUserName.setText(name);
+            } else {
+                tvUserName.setText("User");
+            }
+        } catch (Exception e) {
             tvUserName.setText("User");
+            Log.e("HomeFragment", "Error reading username: " + e.getMessage());
+        } finally {
+            if (cursor != null) cursor.close();
+            if (db != null) db.close();
         }
-        db.close();
     }
 
-    private void loadTodayTargetsAndLog() {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+    /**
+     * Ambil data log aktivitas hari ini dari tabel ActivityLog,
+     * dan target hari ini dari tabel DailyTargets (jika ada, jika tidak pakai default).
+     */
+    private void loadTodayActivityLogAndTargets() {
+        SQLiteDatabase db = null;
+        Cursor cursorTarget = null;
+        Cursor cursorLog = null;
+        try {
+            db = dbHelper.getReadableDatabase();
+            String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
-        int targetSteps = 10000, targetExercise = 30, targetWater = 2000;
-        double targetSleep = 8.0;
+            // Default target jika tidak ada data di tabel DailyTargets
+            int targetSteps = 10000, targetExercise = 30, targetWater = 2000;
+            double targetSleep = 8.0;
 
-        String[] projectionTarget = {
-                DatabaseContract.DailyTargets.COLUMN_TARGET_STEPS,
-                DatabaseContract.DailyTargets.COLUMN_TARGET_EXERCISE,
-                DatabaseContract.DailyTargets.COLUMN_TARGET_WATER_ML,
-                DatabaseContract.DailyTargets.COLUMN_TARGET_SLEEP_HR
-        };
-        String selectionTarget = DatabaseContract.DailyTargets.COLUMN_USER_ID + " = ? AND " +
-                DatabaseContract.DailyTargets.COLUMN_DATE + " = ?";
-        String[] selectionArgsTarget = {String.valueOf(currentUserId), today};
+            // Ambil target harian dari tabel
+            cursorTarget = db.rawQuery(
+                    "SELECT * FROM " + DatabaseContract.DailyTargets.TABLE_NAME +
+                            " WHERE " + DatabaseContract.DailyTargets.COLUMN_USER_ID + " = ? AND " +
+                            DatabaseContract.DailyTargets.COLUMN_DATE + " = ?",
+                    new String[]{String.valueOf(currentUserId), todayDate}
+            );
 
-        Cursor cursorTarget = db.query(
-                DatabaseContract.DailyTargets.TABLE_NAME,
-                projectionTarget,
-                selectionTarget,
-                selectionArgsTarget,
-                null,
-                null,
-                null
-        );
+            if (cursorTarget != null && cursorTarget.moveToFirst()) {
+                targetSteps = cursorTarget.getInt(cursorTarget.getColumnIndexOrThrow(DatabaseContract.DailyTargets.COLUMN_TARGET_STEPS));
+                targetExercise = cursorTarget.getInt(cursorTarget.getColumnIndexOrThrow(DatabaseContract.DailyTargets.COLUMN_TARGET_EXERCISE));
+                targetWater = cursorTarget.getInt(cursorTarget.getColumnIndexOrThrow(DatabaseContract.DailyTargets.COLUMN_TARGET_WATER_ML));
+                targetSleep = cursorTarget.getDouble(cursorTarget.getColumnIndexOrThrow(DatabaseContract.DailyTargets.COLUMN_TARGET_SLEEP_HR));
+            }
+            if (cursorTarget != null) cursorTarget.close();
 
-        if (cursorTarget != null && cursorTarget.moveToFirst()) {
-            targetSteps = cursorTarget.getInt(cursorTarget.getColumnIndexOrThrow(DatabaseContract.DailyTargets.COLUMN_TARGET_STEPS));
-            targetExercise = cursorTarget.getInt(cursorTarget.getColumnIndexOrThrow(DatabaseContract.DailyTargets.COLUMN_TARGET_EXERCISE));
-            targetWater = cursorTarget.getInt(cursorTarget.getColumnIndexOrThrow(DatabaseContract.DailyTargets.COLUMN_TARGET_WATER_ML));
-            targetSleep = cursorTarget.getDouble(cursorTarget.getColumnIndexOrThrow(DatabaseContract.DailyTargets.COLUMN_TARGET_SLEEP_HR));
-            cursorTarget.close();
+            // Ambil total log hari ini dari ActivityLog
+            cursorLog = db.rawQuery(
+                    "SELECT " +
+                            "IFNULL(SUM(" + DatabaseContract.ActivityLog.COLUMN_STEPS + "), 0) AS total_steps, " +
+                            "IFNULL(SUM(" + DatabaseContract.ActivityLog.COLUMN_EXERCISE_MIN + "), 0) AS total_exercise, " +
+                            "IFNULL(SUM(" + DatabaseContract.ActivityLog.COLUMN_WATER_ML + "), 0) AS total_water, " +
+                            "IFNULL(SUM(" + DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS + "), 0) AS total_sleep " +
+                            "FROM " + DatabaseContract.ActivityLog.TABLE_NAME +
+                            " WHERE " + DatabaseContract.ActivityLog.COLUMN_USER_ID + " = ? AND " +
+                            DatabaseContract.ActivityLog.COLUMN_DATE + " = ?",
+                    new String[]{String.valueOf(currentUserId), todayDate}
+            );
+
+            int stepsLog = 0, waterLog = 0, exerciseLog = 0;
+            float sleepLog = 0f;
+
+            if (cursorLog != null && cursorLog.moveToFirst()) {
+                stepsLog = cursorLog.getInt(cursorLog.getColumnIndexOrThrow("total_steps"));
+                exerciseLog = cursorLog.getInt(cursorLog.getColumnIndexOrThrow("total_exercise"));
+                waterLog = cursorLog.getInt(cursorLog.getColumnIndexOrThrow("total_water"));
+                sleepLog = cursorLog.getFloat(cursorLog.getColumnIndexOrThrow("total_sleep"));
+            }
+
+            // Tampilkan data ke view
+            tvStepsLog.setText(String.valueOf(stepsLog));
+            tvStepsTarget.setText(String.valueOf(targetSteps));
+            tvExerciseLog.setText(exerciseLog + " min");
+            tvExerciseTarget.setText(targetExercise + " min");
+            tvWaterLog.setText(waterLog + " ml");
+            tvWaterTarget.setText(targetWater + " ml");
+            tvSleepLog.setText(String.format(Locale.getDefault(), "%.1f hr", sleepLog));
+            tvSleepTarget.setText(String.format(Locale.getDefault(), "%.1f hr", targetSleep));
+
+            // Tampilkan motivasi
+            updateMotivation(stepsLog, targetSteps, exerciseLog, targetExercise, waterLog, targetWater, sleepLog, targetSleep);
+
+        } catch (Exception e) {
+            Log.e("HomeFragment", "Error loading log/targets: " + e.getMessage());
+            Toast.makeText(getContext(), "Gagal mengambil data aktivitas hari ini.", Toast.LENGTH_SHORT).show();
+        } finally {
+            if (cursorTarget != null) cursorTarget.close();
+            if (cursorLog != null) cursorLog.close();
+            if (db != null) db.close();
         }
-
-        int stepsLog = 0, waterLog = 0;
-        float sleepLog = 0f;
-        int exerciseLog = 0; // Tambahkan jika ada kolom exercise di ActivityLog
-
-        String[] projectionLog = {
-                DatabaseContract.ActivityLog.COLUMN_STEPS,
-                DatabaseContract.ActivityLog.COLUMN_WATER_ML,
-                DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS
-        };
-        String selectionLog = DatabaseContract.ActivityLog.COLUMN_USER_ID + " = ? AND " +
-                DatabaseContract.ActivityLog.COLUMN_DATE + " = ?";
-        String[] selectionArgsLog = {String.valueOf(currentUserId), today};
-
-        Cursor cursorLog = db.query(
-                DatabaseContract.ActivityLog.TABLE_NAME,
-                projectionLog,
-                selectionLog,
-                selectionArgsLog,
-                null,
-                null,
-                null
-        );
-
-        if (cursorLog != null && cursorLog.moveToFirst()) {
-            stepsLog = cursorLog.getInt(cursorLog.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_STEPS));
-            waterLog = cursorLog.getInt(cursorLog.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_WATER_ML));
-            sleepLog = cursorLog.getFloat(cursorLog.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS));
-            cursorLog.close();
-        }
-        db.close();
-
-        tvStepsLog.setText(String.valueOf(stepsLog));
-        tvStepsTarget.setText(String.valueOf(targetSteps));
-
-        tvExerciseLog.setText(exerciseLog + " min");
-        tvExerciseTarget.setText(targetExercise + " min");
-
-        tvWaterLog.setText(waterLog + " ml");
-        tvWaterTarget.setText(targetWater + " ml");
-
-        tvSleepLog.setText(String.format("%.1f hr", sleepLog));
-        tvSleepTarget.setText(String.format("%.1f hr", targetSleep));
-
-        updateMotivation(stepsLog, targetSteps, exerciseLog, targetExercise, waterLog, targetWater, sleepLog, targetSleep);
     }
 
     private void updateMotivation(int steps, int stepsTarget, int exercise, int exerciseTarget, int water, int waterTarget, float sleep, double sleepTarget) {
