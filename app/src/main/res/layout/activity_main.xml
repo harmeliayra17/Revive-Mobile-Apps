@@ -22,21 +22,7 @@
         android:layout_above="@id/bottom_navigation"
         android:background="#EBEBEB" />
 
-    <!-- FAB untuk Add Track -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add"
-        android:layout_width="78dp"
-        android:layout_height="78dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="40dp"
-        android:contentDescription="Add Track"
-        android:elevation="8dp"
-        android:src="@drawable/ic_add"
-        app:backgroundTint="@color/color_primary"
-        app:maxImageSize="28dp"
-        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Fab"
-        app:tint="@android:color/white" />
+
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

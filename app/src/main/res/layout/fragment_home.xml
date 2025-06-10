@@ -20,18 +20,10 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/profileImage"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/profilepic"
-                app:civ_border_color="#E0E0E0"
-                app:civ_border_width="2dp" />
-
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="0dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -103,19 +95,6 @@
                         android:background="@drawable/redbg"
                         android:padding="16dp">
 
-                        <!-- Progress Circle -->
-                        <ProgressBar
-                            android:id="@+id/progressExercise"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentTop="true"
-                            android:layout_alignParentEnd="true"
-                            android:background="@drawable/circle_progress_bg"
-                            android:max="100"
-                            android:progress="71"
-                            android:progressDrawable="@drawable/circular_progress_bar" />
-
                         <!-- Content -->
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -168,19 +147,6 @@
                         android:layout_height="match_parent"
                         android:background="@drawable/redbg"
                         android:padding="16dp">
-
-                        <!-- Progress Circle -->
-                        <ProgressBar
-                            android:id="@+id/progressSteps"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:layout_alignParentTop="true"
-                            android:layout_alignParentEnd="true"
-                            android:background="@drawable/circle_progress_bg"
-                            android:max="100"
-                            android:progress="48"
-                            android:progressDrawable="@drawable/circular_progress_bar" />
 
                         <!-- Content -->
                         <LinearLayout
@@ -244,19 +210,6 @@
                         android:background="@drawable/redbg"
                         android:padding="16dp">
 
-                        <!-- Progress Circle -->
-                        <ProgressBar
-                            android:id="@+id/progressWater"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:layout_alignParentTop="true"
-                            android:layout_alignParentEnd="true"
-                            android:background="@drawable/circle_progress_bg"
-                            android:max="100"
-                            android:progress="60"
-                            android:progressDrawable="@drawable/circular_progress_bar" />
-
                         <!-- Content -->
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -309,19 +262,6 @@
                         android:layout_height="match_parent"
                         android:background="@drawable/redbg"
                         android:padding="16dp">
-
-                        <!-- Progress Circle -->
-                        <ProgressBar
-                            android:id="@+id/progressSleep"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:layout_alignParentTop="true"
-                            android:layout_alignParentEnd="true"
-                            android:background="@drawable/circle_progress_bg"
-                            android:max="100"
-                            android:progress="88"
-                            android:progressDrawable="@drawable/circular_progress_bar" />
 
                         <!-- Content -->
                         <LinearLayout

@@ -1,0 +1,57 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center">
+
+        <EditText
+            android:id="@+id/et_steps"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="Steps Today"
+            android:inputType="number"
+            android:background="@drawable/edittext_background"
+            android:paddingHorizontal="12dp"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/et_water_intake"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="Water Intake (ml)"
+            android:inputType="number"
+            android:background="@drawable/edittext_background"
+            android:paddingHorizontal="12dp"
+            android:textSize="14sp"
+            android:layout_marginTop="12dp" />
+
+        <EditText
+            android:id="@+id/et_sleep_duration"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="Sleep Duration (hours)"
+            android:inputType="numberDecimal"
+            android:background="@drawable/edittext_background"
+            android:paddingHorizontal="12dp"
+            android:textSize="14sp"
+            android:layout_marginTop="12dp" />
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/color_primary"
+            android:textColor="@android:color/white"
+            android:textAllCaps="false"
+            android:paddingVertical="12dp"
+            android:textSize="16sp" />
+    </LinearLayout>
+</ScrollView>

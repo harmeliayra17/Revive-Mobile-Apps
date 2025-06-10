@@ -12,174 +12,100 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.revivo.R;
+import com.example.revivo.data.local.database.DatabaseHelper;
+import com.example.revivo.data.local.model.ActivityLog;
+import com.example.revivo.data.local.model.DailyTarget;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
+
+import com.example.revivo.R;
+import com.example.revivo.data.local.database.DatabaseHelper;
+import com.example.revivo.data.local.model.ActivityLog;
+import com.example.revivo.data.local.model.DailyTarget;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class HomeFragment extends Fragment {
 
-    // UI Components
-    private CircleImageView profileImage;
-    private TextView tvUserName;
-    private TextView tvExerciseTime;
-    private TextView tvStepsCount;
-    private TextView tvWaterIntake;
-    private TextView tvSleepDuration;
+    private TextView tvStepsCount, tvExerciseTime, tvWaterIntake, tvSleepDuration;
+    private ProgressBar progressSteps, progressExercise, progressWater, progressSleep;
 
-    // Progress Bars
-    private ProgressBar progressExercise;
-    private ProgressBar progressSteps;
-    private ProgressBar progressWater;
-    private ProgressBar progressSleep;
+    private DatabaseHelper dbHelper;
+    private long currentUserId = 1; // ganti sesuai user login
 
-    // Data variables
-    private String userName = "Harmeliayra";
-    private int targetExerciseTime = 45; // minutes    private int currentExerciseTime = getCurrentExerciseTime(); // minutes
-    private int targetSteps = 8000;
-    private double targetWaterIntake = 2.5; // liters    private int currentSteps = getCurrentSteps();
-    private int targetSleepHours = 8; // hours
-
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        initViews(view);
-        loadData();
+        // Inisialisasi DB
+        dbHelper = new DatabaseHelper(requireContext());
 
-        return view;
-    }
-    private void initViews(View view) {
-        // Initialize UI components
-        profileImage = view.findViewById(R.id.profileImage);
-        tvUserName = view.findViewById(R.id.tvUserName);
-        tvExerciseTime = view.findViewById(R.id.tvExerciseTime);
+        // Inisialisasi view dari XML
         tvStepsCount = view.findViewById(R.id.tvStepsCount);
+        tvExerciseTime = view.findViewById(R.id.tvExerciseTime);
         tvWaterIntake = view.findViewById(R.id.tvWaterIntake);
         tvSleepDuration = view.findViewById(R.id.tvSleepDuration);
 
-        // Initialize progress bars
-        progressExercise = view.findViewById(R.id.progressExercise);
-        progressSteps = view.findViewById(R.id.progressSteps);
-        progressWater = view.findViewById(R.id.progressWater);
-        progressSleep = view.findViewById(R.id.progressSleep);
-    }private double currentWaterIntake = getCurrentWaterIntake(); // liters
+        // Load data
+        loadTodayData();
 
-private void loadData() {
-        // Load user data (you can replace this with actual data from database/API)
-        loadUserData();
-        loadHealthData();
-        updateProgressBars();
+        return view;
     }
 
-        private void loadUserData() {
-        // Set user name
-        tvUserName.setText(userName);
+    private void loadTodayData() {
+        String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
-        // You can set profile image here if needed
-        // profileImage.setImageResource(R.drawable.profilepic);
-    }
-    private void loadHealthData() {
-        // Update exercise time
-        tvExerciseTime.setText(currentExerciseTime + " min / " + targetExerciseTime + " min");
+        ActivityLog log = dbHelper.getActivityLogByDate(currentUserId, todayDate);
+        DailyTarget target = dbHelper.getDailyTargetByDate(currentUserId, todayDate);
 
-        // Update steps count
-        tvStepsCount.setText(String.format("%,d / %,d", currentSteps, targetSteps));
+        // Default nilai
+        int steps = 0, targetSteps = 8000;
+        int exercise = 0, targetExercise = 45;
+        int water = 0, targetWater = 2500; // ml
+        float sleep = 0; // jam
+        float targetSleep = 8;
 
-        // Update water intake
-        tvWaterIntake.setText(currentWaterIntake + "L / " + targetWaterIntake + "L");
-
-        // Update sleep duration
-        tvSleepDuration.setText(currentSleepHours + "h / " + targetSleepHours + "h");
-    }private int currentSleepHours = getCurrentSleepHours(); // hours
-
-    private void updateProgressBars() {
-        // Calculate and set progress for exercise
-        int exerciseProgress = (int) ((double) currentExerciseTime / targetExerciseTime * 100);
-        progressExercise.setProgress(exerciseProgress);
-
-        // Calculate and set progress for steps
-        int stepsProgress = (int) ((double) currentSteps / targetSteps * 100);
-        progressSteps.setProgress(stepsProgress);
-
-        // Calculate and set progress for water intake
-        int waterProgress = (int) (currentWaterIntake / targetWaterIntake * 100);
-        progressWater.setProgress(waterProgress);
-
-        // Calculate and set progress for sleep
-        int sleepProgress = (int) ((double) currentSleepHours / targetSleepHours * 100);
-        progressSleep.setProgress(sleepProgress);
-    }
-
-    // Method to update exercise data (can be called from other parts of the app)
-    public void updateExerciseData(int currentMinutes, int targetMinutes) {
-        this.currentExerciseTime = currentMinutes;
-        this.targetExerciseTime = targetMinutes;
-
-        if (tvExerciseTime != null) {
-            tvExerciseTime.setText(currentMinutes + " min / " + targetMinutes + " min");
-            int progress = (int) ((double) currentMinutes / targetMinutes * 100);
-            progressExercise.setProgress(progress);
+        // Ambil data dari DB jika tersedia
+        if (log != null) {
+            steps = log.getSteps();
+            exercise = log.getExerciseMinutes();
+            water = log.getWaterMl();
+            sleep = log.getSleepHours();
         }
-    }
 
-    // Method to update steps data
-    public void updateStepsData(int currentSteps, int targetSteps) {
-        this.currentSteps = currentSteps;
-        this.targetSteps = targetSteps;
-
-        if (tvStepsCount != null) {
-            tvStepsCount.setText(String.format("%,d / %,d", currentSteps, targetSteps));
-            int progress = (int) ((double) currentSteps / targetSteps * 100);
-            progressSteps.setProgress(progress);
+        if (target != null) {
+            targetSteps = target.getTargetSteps();
+            targetExercise = target.getTargetExercise();
+            targetWater = target.getTargetWaterMl();
+            targetSleep = target.getTargetSleepHr();
         }
+
+        // Update teks
+        tvStepsCount.setText(steps + " / " + targetSteps);
+        tvExerciseTime.setText(exercise + " min / " + targetExercise + " min");
+        tvWaterIntake.setText((water / 1000.0) + "L / " + (targetWater / 1000.0) + "L");
+        tvSleepDuration.setText(sleep + "h / " + targetSleep + "h");
+
+        // Update progres bar
+        progressSteps.setProgress(Math.min((steps * 100) / targetSteps, 100));
+        progressExercise.setProgress(Math.min((exercise * 100) / targetExercise, 100));
+        progressWater.setProgress(Math.min((water * 100) / targetWater, 100));
+        progressSleep.setProgress((int) Math.min((sleep * 100) / targetSleep, 100));
     }
-
-    // Method to update water intake data
-    public void updateWaterData(double currentLiters, double targetLiters) {
-        this.currentWaterIntake = currentLiters;
-        this.targetWaterIntake = targetLiters;
-
-        if (tvWaterIntake != null) {
-            tvWaterIntake.setText(currentLiters + "L / " + targetLiters + "L");
-            int progress = (int) (currentLiters / targetLiters * 100);
-            progressWater.setProgress(progress);
-        }
-    }
-
-    // Method to update sleep data
-    public void updateSleepData(int currentHours, int targetHours) {
-        this.currentSleepHours = currentHours;
-        this.targetSleepHours = targetHours;
-
-        if (tvSleepDuration != null) {
-            tvSleepDuration.setText(currentHours + "h / " + targetHours + "h");
-            int progress = (int) ((double) currentHours / targetHours * 100);
-            progressSleep.setProgress(progress);
-        }
-    }
-
-    // Method to refresh all data (useful for when returning to fragment)
-    public void refreshData() {
-        if (getView() != null) {
-            loadData();
-        }
-    }
-
-    // Getter methods for accessing current data
-    public int getCurrentExerciseTime() { return currentExerciseTime; }
-
-    public int getCurrentSteps() { return currentSteps; }
-
-    public double getCurrentWaterIntake() { return currentWaterIntake; }
-
-    public int getCurrentSleepHours() { return currentSleepHours; }
-
-
-
-
-
-
-
-
-
 }

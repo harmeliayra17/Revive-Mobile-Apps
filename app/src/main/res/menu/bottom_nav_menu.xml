@@ -10,16 +10,12 @@
         android:icon="@drawable/ic_exercise"
         android:title="Exercise" />
     <item
-        android:id="@+id/nav_dummy"
+        android:id="@+id/nav_add"
         android:enabled="true"
         android:fontFamily="@font/poppins_medium"
-        android:icon="@drawable/ic_transparent"
+        android:icon="@drawable/ic_add"
         android:title="Add Track" />
-    <item
-        android:id="@+id/nav_progress"
-        android:fontFamily="@font/poppins_medium"
-        android:icon="@drawable/ic_progress"
-        android:title="Progress" />
+
     <item
         android:id="@+id/nav_profile"
         android:fontFamily="@font/poppins_medium"

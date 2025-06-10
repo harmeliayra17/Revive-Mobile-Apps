@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.revivo.data.local.database.DatabaseHelper;
+import com.example.revivo.ui.add.AddActivityLogFragment;
 import com.example.revivo.ui.exercise.ExerciseFragment;
 import com.example.revivo.ui.home.HomeFragment;
 import com.example.revivo.ui.profile.ProfileFragment;
@@ -62,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
                     fragment = new ExerciseFragment();
                 } else if (itemId == R.id.nav_profile) {
                     fragment = new ProfileFragment();
-                } else if (itemId == R.id.nav_progress || itemId == R.id.nav_dummy) {
-                    return false;
+                } else if (itemId == R.id.nav_add ) {
+                    fragment = new AddActivityLogFragment();
                 }
 
                 if (fragment != null) {
@@ -74,10 +75,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // FAB listener (jika kamu ingin pakai Floating Action Button)
-        findViewById(R.id.fab_add).setOnClickListener(view -> {
-            // Aksi FAB di sini
-        });
+
     }
 
     private boolean isUserLoggedIn() {
