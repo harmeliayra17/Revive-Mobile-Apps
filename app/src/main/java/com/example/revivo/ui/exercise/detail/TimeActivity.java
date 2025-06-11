@@ -2,6 +2,7 @@ package com.example.revivo.ui.exercise.detail;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.widget.EditText;
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.revivo.R;
 import com.example.revivo.data.local.database.ActivityLogHelper;
+import com.example.revivo.data.local.database.DatabaseContract;
 import com.example.revivo.data.local.database.ExerciseLogHelper;
 
 import java.text.SimpleDateFormat;
@@ -285,24 +287,46 @@ public class TimeActivity extends AppCompatActivity {
             String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
             long userId = 1L; // TODO: Get actual userId from session
 
-            // 1. Insert to Exercise_Log
+            // 1. Insert ke Exercise_Log
             long insertResult = exerciseLogHelper.insert(userId, exerciseId, exerciseName, actualMinutes);
 
             if (insertResult > 0) {
-                // 2. Totalkan hari ini
-                int totalDuration = exerciseLogHelper.sumDurationByDate(userId, today);
+                // 2. Totalkan exercise hari ini
+                double totalDuration = exerciseLogHelper.sumDurationByDate(userId, today);
+                int exerciseMinutes = (int) Math.round(totalDuration);
 
-                // 3. Upsert ke Activity_Log
+                // 3. AMBIL DATA BARIS TERAKHIR SAJA dari ActivityLog pada tanggal itu
+                int lastSteps = 0, lastWater = 0;
+                float lastSleep = 0f;
+                Cursor c = activityLogHelper.getReadableDatabase().rawQuery(
+                        "SELECT " +
+                                DatabaseContract.ActivityLog.COLUMN_STEPS + ", " +
+                                DatabaseContract.ActivityLog.COLUMN_WATER_ML + ", " +
+                                DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS +
+                                " FROM " + DatabaseContract.ActivityLog.TABLE_NAME +
+                                " WHERE " + DatabaseContract.ActivityLog.COLUMN_USER_ID + " = ? AND " +
+                                DatabaseContract.ActivityLog.COLUMN_DATE + " = ? " +
+                                "ORDER BY " + DatabaseContract.ActivityLog._ID + " DESC LIMIT 1",
+                        new String[]{String.valueOf(userId), today}
+                );
+                if (c != null && c.moveToFirst()) {
+                    lastSteps = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_STEPS));
+                    lastWater = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_WATER_ML));
+                    lastSleep = c.getFloat(c.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS));
+                    c.close();
+                }
+
+                // 4. Update kolom exercise pada ActivityLog baris terakhir (bukan sum, nilai terakhir)
                 int updated = activityLogHelper.update(userId, today,
-                        0, // steps
-                        totalDuration, // exercise min
-                        0, // water
-                        0f // sleep
+                        lastSteps,
+                        exerciseMinutes,
+                        lastWater,
+                        lastSleep
                 );
                 if (updated == 0) {
-                    activityLogHelper.insert(userId, today, 0, totalDuration, 0, 0f);
+                    activityLogHelper.insert(userId, today, lastSteps, exerciseMinutes, lastWater, lastSleep);
                 }
-                Toast.makeText(this, "Logged " + (int) actualMinutes + " min. Total today: " + totalDuration + " min", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Logged " + (int) actualMinutes + " min. Total today: " + exerciseMinutes + " min", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Failed to save exercise log", Toast.LENGTH_SHORT).show();
             }

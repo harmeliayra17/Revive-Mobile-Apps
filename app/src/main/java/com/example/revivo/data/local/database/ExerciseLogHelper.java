@@ -61,8 +61,8 @@ public class ExerciseLogHelper {
     /**
      * Sum all duration for user and date (date: yyyy-MM-dd)
      */
-    public int sumDurationByDate(long userId, String date) {
-        int sum = 0;
+    public double sumDurationByDate(long userId, String date) {
+        double sum = 0;
         Cursor c = db.rawQuery(
                 "SELECT SUM(" + DatabaseContract.ExerciseLog.COLUMN_DURATION_MIN + ") " +
                         "FROM " + TABLE +
@@ -71,7 +71,7 @@ public class ExerciseLogHelper {
                 new String[]{String.valueOf(userId), date }
         );
         if (c != null) {
-            if (c.moveToFirst() && !c.isNull(0)) sum = c.getInt(0);
+            if (c.moveToFirst() && !c.isNull(0)) sum = c.getDouble(0);
             c.close();
         }
         return sum;

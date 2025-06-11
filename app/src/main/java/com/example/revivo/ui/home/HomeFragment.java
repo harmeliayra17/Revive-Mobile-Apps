@@ -107,13 +107,13 @@ public class HomeFragment extends Fragment {
     }
 
     /**
-     * Ambil data log aktivitas hari ini dari tabel ActivityLog,
+     * Ambil data log aktivitas hari ini dari baris terakhir tabel ActivityLog,
      * dan target hari ini dari tabel DailyTargets (jika ada, jika tidak pakai default).
      */
     private void loadTodayActivityLogAndTargets() {
         SQLiteDatabase db = null;
         Cursor cursorTarget = null;
-        Cursor cursorLog = null;
+        Cursor cursorLastLog = null;
         try {
             db = dbHelper.getReadableDatabase();
             String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
@@ -138,28 +138,31 @@ public class HomeFragment extends Fragment {
             }
             if (cursorTarget != null) cursorTarget.close();
 
-            // Ambil total log hari ini dari ActivityLog
-            cursorLog = db.rawQuery(
+            // --- Perubahan utama di sini: ganti ORDER BY updated_at DESC jadi ORDER BY _ID DESC ---
+            cursorLastLog = db.rawQuery(
                     "SELECT " +
-                            "IFNULL(SUM(" + DatabaseContract.ActivityLog.COLUMN_STEPS + "), 0) AS total_steps, " +
-                            "IFNULL(SUM(" + DatabaseContract.ActivityLog.COLUMN_EXERCISE_MIN + "), 0) AS total_exercise, " +
-                            "IFNULL(SUM(" + DatabaseContract.ActivityLog.COLUMN_WATER_ML + "), 0) AS total_water, " +
-                            "IFNULL(SUM(" + DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS + "), 0) AS total_sleep " +
-                            "FROM " + DatabaseContract.ActivityLog.TABLE_NAME +
+                            DatabaseContract.ActivityLog.COLUMN_STEPS + ", " +
+                            DatabaseContract.ActivityLog.COLUMN_EXERCISE_MIN + ", " +
+                            DatabaseContract.ActivityLog.COLUMN_WATER_ML + ", " +
+                            DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS +
+                            " FROM " + DatabaseContract.ActivityLog.TABLE_NAME +
                             " WHERE " + DatabaseContract.ActivityLog.COLUMN_USER_ID + " = ? AND " +
-                            DatabaseContract.ActivityLog.COLUMN_DATE + " = ?",
+                            DatabaseContract.ActivityLog.COLUMN_DATE + " = ? " +
+                            "ORDER BY " + DatabaseContract.ActivityLog._ID + " DESC LIMIT 1", // <--- DIUBAH
                     new String[]{String.valueOf(currentUserId), todayDate}
             );
+            // --- Akhir perubahan utama ---
 
-            int stepsLog = 0, waterLog = 0, exerciseLog = 0;
+            int stepsLog = 0, exerciseLog = 0, waterLog = 0;
             float sleepLog = 0f;
 
-            if (cursorLog != null && cursorLog.moveToFirst()) {
-                stepsLog = cursorLog.getInt(cursorLog.getColumnIndexOrThrow("total_steps"));
-                exerciseLog = cursorLog.getInt(cursorLog.getColumnIndexOrThrow("total_exercise"));
-                waterLog = cursorLog.getInt(cursorLog.getColumnIndexOrThrow("total_water"));
-                sleepLog = cursorLog.getFloat(cursorLog.getColumnIndexOrThrow("total_sleep"));
+            if (cursorLastLog != null && cursorLastLog.moveToFirst()) {
+                stepsLog = cursorLastLog.getInt(cursorLastLog.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_STEPS));
+                exerciseLog = cursorLastLog.getInt(cursorLastLog.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_EXERCISE_MIN));
+                waterLog = cursorLastLog.getInt(cursorLastLog.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_WATER_ML));
+                sleepLog = cursorLastLog.getFloat(cursorLastLog.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS));
             }
+            if (cursorLastLog != null) cursorLastLog.close();
 
             // Tampilkan data ke view
             tvStepsLog.setText(String.valueOf(stepsLog));
@@ -179,7 +182,7 @@ public class HomeFragment extends Fragment {
             Toast.makeText(getContext(), "Gagal mengambil data aktivitas hari ini.", Toast.LENGTH_SHORT).show();
         } finally {
             if (cursorTarget != null) cursorTarget.close();
-            if (cursorLog != null) cursorLog.close();
+            if (cursorLastLog != null) cursorLastLog.close();
             if (db != null) db.close();
         }
     }

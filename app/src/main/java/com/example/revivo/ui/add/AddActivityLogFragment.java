@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.revivo.R;
 import com.example.revivo.data.local.database.DatabaseHelper;
+import com.example.revivo.data.local.database.DatabaseContract;
 import com.example.revivo.data.local.model.ActivityLog;
 
 import org.jetbrains.annotations.Nullable;
@@ -60,9 +61,9 @@ public class AddActivityLogFragment extends Fragment {
         }
 
         try {
-            int steps = Integer.parseInt(stepStr);
-            int water = Integer.parseInt(waterStr);
-            float sleep = Float.parseFloat(sleepStr);
+            int stepsInput = Integer.parseInt(stepStr);
+            int waterInput = Integer.parseInt(waterStr);
+            float sleepInput = Float.parseFloat(sleepStr);
 
             long userId = requireActivity()
                     .getSharedPreferences("user_session", Context.MODE_PRIVATE)
@@ -73,17 +74,53 @@ public class AddActivityLogFragment extends Fragment {
                 return;
             }
 
+            String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+            DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+
+            // --- AMBIL DATA BARIS TERAKHIR SAJA (BUKAN SUM) ---
+            int lastSteps = 0, lastWater = 0, lastExercise = 0;
+            float lastSleep = 0f;
+            try {
+                String lastQuery = "SELECT " +
+                        DatabaseContract.ActivityLog.COLUMN_STEPS + ", " +
+                        DatabaseContract.ActivityLog.COLUMN_WATER_ML + ", " +
+                        DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS + ", " +
+                        DatabaseContract.ActivityLog.COLUMN_EXERCISE_MIN +
+                        " FROM " + DatabaseContract.ActivityLog.TABLE_NAME +
+                        " WHERE " + DatabaseContract.ActivityLog.COLUMN_USER_ID + "=? AND " +
+                        DatabaseContract.ActivityLog.COLUMN_DATE + "=?" +
+                        " ORDER BY " + DatabaseContract.ActivityLog._ID + " DESC LIMIT 1";
+                android.database.Cursor c = dbHelper.getReadableDatabase().rawQuery(lastQuery, new String[]{
+                        String.valueOf(userId), today
+                });
+                if (c != null && c.moveToFirst()) {
+                    lastSteps = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_STEPS));
+                    lastWater = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_WATER_ML));
+                    lastSleep = c.getFloat(c.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_SLEEP_HOURS));
+                    lastExercise = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.ActivityLog.COLUMN_EXERCISE_MIN));
+                    c.close();
+                }
+            } catch (Exception e) {
+                // Default tetap 0 jika error
+            }
+
+            // Tambahkan input baru ke data baris terakhir saja
+            int sumSteps = lastSteps + stepsInput;
+            int sumWater = lastWater + waterInput;
+            float sumSleep = lastSleep + sleepInput;
+
             // Buat objek ActivityLog
             ActivityLog log = new ActivityLog();
             log.setUserId(userId);
-            log.setDate(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
-            log.setSteps(steps);
-            log.setWaterMl(water);
-            log.setSleepHours(sleep);
-            log.setUpdatedAt(new Date().toString());
+            log.setDate(today);
+            log.setSteps(sumSteps);
+            log.setWaterMl(sumWater);
+            log.setSleepHours(sumSleep);
+            log.setExerciseMinutes(lastExercise); // exercise dari baris terakhir
+            log.setUpdatedAt(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
 
             // Simpan ke database
-            DatabaseHelper dbHelper = new DatabaseHelper(getContext());
             dbHelper.insertActivityLog(log);
 
             Toast.makeText(getContext(), "Log berhasil disimpan", Toast.LENGTH_SHORT).show();

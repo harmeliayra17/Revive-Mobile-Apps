@@ -19,11 +19,15 @@ public class ActivityLogHelper {
         db = dbHelper.getWritableDatabase();
     }
 
+    public SQLiteDatabase getReadableDatabase() {
+        return db;
+    }
+
     public void close() {
         dbHelper.close();
     }
 
-    public long insert(long userId, String date, int steps, int exerciseMin, int waterMl, float sleepHr) {
+    public long insert(long userId, String date, int steps, double exerciseMin, int waterMl, float sleepHr) {
         ContentValues cv = new ContentValues();
         cv.put(DatabaseContract.ActivityLog.COLUMN_USER_ID, userId);
         cv.put(DatabaseContract.ActivityLog.COLUMN_DATE, date);
@@ -34,7 +38,7 @@ public class ActivityLogHelper {
         return db.insert(TABLE, null, cv);
     }
 
-    public int update(long userId, String date, int steps, int exerciseMin, int waterMl, float sleepHr) {
+    public int update(long userId, String date, int steps, double exerciseMin, int waterMl, float sleepHr) {
         ContentValues cv = new ContentValues();
         cv.put(DatabaseContract.ActivityLog.COLUMN_STEPS, steps);
         cv.put(DatabaseContract.ActivityLog.COLUMN_EXERCISE_MIN, exerciseMin);
